@@ -32,6 +32,9 @@ func Migrate(db *gorm.DB) error {
 		&models.Attachment{},
 		&models.Label{},
 		&models.TaskLabel{},
+
+		// 活动日志
+		&models.ActivityLog{},
 	)
 
 	if err != nil {

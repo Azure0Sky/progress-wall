@@ -2,6 +2,7 @@ package routes
 
 import (
 	"progress-wall-backend/config"
+	"progress-wall-backend/handlers/activity"
 	"progress-wall-backend/handlers/auth"
 	"progress-wall-backend/handlers/user"
 	"progress-wall-backend/middleware"
@@ -33,6 +34,8 @@ func SetupRoutes(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	loginHandler := auth.NewLoginHandler(db, cfg)
 	registerHandler := auth.NewRegisterHandler(db, cfg)
 	profileHandler := user.NewProfileHandler(db)
+	boardActivitiesHandler := activity.NewBoardActivitiesHandler(db)
+	taskActivitiesHandler := activity.NewTaskActivitiesHandler(db)
 
 	// 公开路由（不需要认证）
 	api := r.Group("/api")
@@ -48,7 +51,14 @@ func SetupRoutes(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	protected := api.Group("")
 	protected.Use(middleware.AuthMiddleware(cfg))
 	{
+		// 用户相关
 		protected.GET("/user/profile", profileHandler.GetProfile)
+
+		// 看板活动日志
+		protected.GET("/boards/:board_id/activities", boardActivitiesHandler.GetBoardActivities)
+
+		// 任务活动日志
+		protected.GET("/tasks/:task_id/activities", taskActivitiesHandler.GetTaskActivities)
 	}
 
 	return r
