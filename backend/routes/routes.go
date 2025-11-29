@@ -201,10 +201,16 @@ func SetupRoutes(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		)
 
 		// 看板活动日志
-		protected.GET("/boards/:boardId/activities", boardActivitiesHandler.GetBoardActivities)
+		protected.GET("/boards/:boardId/activities",
+			rbac.RequireProjectAccess("view", "boardId", "board"),
+			boardActivitiesHandler.GetBoardActivities,
+		)
 
 		// 任务活动日志
-		protected.GET("/tasks/:taskId/activities", taskActivitiesHandler.GetTaskActivities)
+		protected.GET("/tasks/:taskId/activities",
+			rbac.RequireProjectAccess("view", "taskId", "task"),
+			taskActivitiesHandler.GetTaskActivities,
+		)
 	}
 
 	return r
